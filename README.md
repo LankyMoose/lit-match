@@ -1,6 +1,6 @@
-# %PACKAGE-NAME%
+# lit-match
 
-Development monorepo template for **%PACKAGE-NAME%**.
+Development monorepo template for **lit-match**.
 
 Get started by running
 
@@ -16,7 +16,7 @@ node setup --package packagename --github mygithubusername --email me@hotmail.co
   - Contains workflows used by GitHub Actions.
 - `packages`
   - Contains the individual packages managed in the monorepo.
-  - [%PACKAGE-NAME%](https://github.com/%GITHUB-USERNAME%/%PACKAGE-NAME%/blob/main/packages/lib)
+  - [lit-match](https://github.com/LankyMoose/lit-match/blob/main/packages/lib)
 - `sandbox`
   - Contains example applications and random tidbits.
 

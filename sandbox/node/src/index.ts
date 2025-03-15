@@ -1,7 +1,17 @@
-import { add } from "%PACKAGE-NAME%"
+import { match } from "lit-match"
 
-function main() {
-  console.log(add(1, 2))
+enum Progress {
+  None,
+  Loading,
+  Loaded,
 }
 
-main()
+const currentProgress = Progress.Loaded as Progress
+
+const result = match(currentProgress)
+  .with(Progress.None, () => null)
+  .with(Progress.Loading, () => "loading")
+  .with(Progress.Loaded, () => "loaded")
+  .exhaustive()
+
+console.log({ result })
