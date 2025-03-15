@@ -1,5 +1,8 @@
-// @ts-ignore
-export class NonExhaustiveError<T> extends Error {}
+export class NonExhaustiveError<T> extends Error {
+  constructor(public value?: T) {
+    super("[lit-match]: Non-exhaustive match")
+  }
+}
 
 type MatcherElseParam<Remaining> = [Remaining] extends [never]
   ? unknown
@@ -56,7 +59,7 @@ export function match<Value>(value: Value) {
     else: resolve,
     exhaustive() {
       return resolve(() => {
-        throw new NonExhaustiveError()
+        throw new NonExhaustiveError(value)
       })
     },
   } as Matcher<Value, never, Value>
