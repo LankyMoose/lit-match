@@ -1,15 +1,23 @@
 // @ts-ignore
 export class NonExhaustiveError<T> extends Error {}
 
-type Matcher<T, R, Remaining = T> = {
-  with<V extends Remaining, U extends (value: V) => any>(
-    matchValue: V,
-    handler: U
-  ): Matcher<T, R | ReturnType<U>, Exclude<Remaining, V>>
-  else: <U extends (value: Remaining) => any>(handler: U) => R | ReturnType<U>
-  exhaustive: [Remaining] extends [never]
-    ? () => R
-    : NonExhaustiveError<Remaining>
+type MatcherElseParam<Remaining> = [Remaining] extends [never]
+  ? unknown
+  : Remaining
+
+type MatcherExhaustive<Result, Remaining> = [Remaining] extends [never]
+  ? () => Result
+  : NonExhaustiveError<Remaining>
+
+type Matcher<Value, Result, Remaining = Value> = {
+  with<MatchVal extends Remaining, Handler extends (value: MatchVal) => any>(
+    matchValue: MatchVal,
+    handler: Handler
+  ): Matcher<Value, Result | ReturnType<Handler>, Exclude<Remaining, MatchVal>>
+  else: <Handler extends (value: MatcherElseParam<Remaining>) => any>(
+    handler: Handler
+  ) => Result | ReturnType<Handler>
+  exhaustive: MatcherExhaustive<Result, Remaining>
 }
 
 /**
@@ -27,7 +35,7 @@ type Matcher<T, R, Remaining = T> = {
  * //           ^? string
  * ```
  */
-export function match<T>(value: T) {
+export function match<Value>(value: Value) {
   const handlers: [unknown, Function][] = []
   const resolve = (fallback: Function) => {
     for (const [matchValue, handler] of handlers) {
@@ -40,9 +48,9 @@ export function match<T>(value: T) {
     with(matchValue, handler) {
       handlers.push([matchValue, handler])
       return this as Matcher<
-        T,
+        Value,
         ReturnType<typeof handler>,
-        Exclude<T, typeof matchValue>
+        Exclude<Value, typeof matchValue>
       >
     },
     else: resolve,
@@ -51,5 +59,5 @@ export function match<T>(value: T) {
         throw new NonExhaustiveError()
       })
     },
-  } as Matcher<T, never, T>
+  } as Matcher<Value, never, Value>
 }
